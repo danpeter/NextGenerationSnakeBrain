@@ -1,6 +1,8 @@
 
 package awsomebrain;
 
+import java.util.LinkedList;
+import java.util.List;
 import se.citerus.crazysnake.*;
 
 import static se.citerus.crazysnake.Direction.*;
@@ -28,43 +30,41 @@ public class pwnBrain extends BaseBrain {
     }
 
     private Movement calculateNextMove(HeatState state) {
-        try {
-            Snake me = state.getSnake(new BrainId(this));
-
-            Position headPosition = me.getHeadPosition();
-            Direction direction = me.getDirection();
-
-            Square[] lookAheadArr = new Square[LOOK_AHEAD];
-            int x = headPosition.getX();
-            int y = headPosition.getY();
-
-            if (direction == EAST) {
-                for (int i = 1; i <= LOOK_AHEAD; i++)
-                    lookAheadArr[i - 1] = state.getSquare(x + i, y);
-            } else if (direction == WEST) {
-                for (int i = 1; i <= LOOK_AHEAD; i++)
-                    lookAheadArr[i - 1] = state.getSquare(x - i, y);
-            } else if (direction == NORTH) {
-                for (int i = 1; i <= LOOK_AHEAD; i++)
-                    lookAheadArr[i - 1] = state.getSquare(x, y - i);
-            } else {
-                for (int i = 1; i <= LOOK_AHEAD; i++)
-                    lookAheadArr[i - 1] = state.getSquare(x, y + i);
+       
+        Snake me = state.getSnake(new BrainId(this));
+        Position headPosition = me.getHeadPosition();
+        List<Position> fruits = state.getFruitPositions();
+        Direction direction = me.getDirection();
+        
+        AStar algo = new AStar(state);
+        List<Position> bestPath = new LinkedList<Position>();
+        for(Position fruit : fruits) {
+            List<Position> path = algo.getBestPath(headPosition, fruit);
+            if(path.size() < bestPath.size()) {
+                bestPath = path;
             }
-
-            return anyIsOccupied(lookAheadArr) ? getDodgeProblemsAheadDirection() : FORWARD;
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return null;
+        
+        
+        Position nextMove = bestPath.get(0);
+        Direction newDirection = calculateDirection(headPosition, nextMove);     
+        return Direction.newMovement(direction, direction);
     }
-
-    private boolean anyIsOccupied(Square[] arr) {
-        for (Square square : arr) {
-            if (!square.isUnoccupied()) return true;
+    
+    public Direction calculateDirection(Position position1, Position position2) {
+        if(position2.getX() > position1.getX()) {
+            return EAST;
         }
-        return false;
+        if(position2.getX() < position1.getX()) {
+            return WEST;
+        }
+        if(position2.getY() > position1.getY()) {
+            return NORTH;
+        }
+        if(position2.getY() < position1.getY()) {
+            return SOUTH;
+        }
+        return NORTH;
     }
 
     @Override
