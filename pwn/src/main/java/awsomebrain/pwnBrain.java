@@ -43,7 +43,7 @@ public class pwnBrain extends BaseBrain {
 		Direction direction = me.getDirection();
 
 		participants.remove(getName());
-		AStar algo = new AStar(state, participants);
+		AStar algo = new AStar(state, participants, me);
 		List<Position> bestPath = new LinkedList<Position>();
 		
 		if (fruits.isEmpty()) {

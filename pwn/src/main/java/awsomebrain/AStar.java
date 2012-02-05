@@ -30,10 +30,12 @@ public class AStar {
 	private Set<String> opponents;
 	private Set<Position> opponentThreatPositions;
 	private boolean checkThreatPositions;
+        private final Snake me;
 
-	public AStar(GameState state, Set<String> opponents) {
+	public AStar(GameState state, Set<String> opponents, Snake me) {
 		this.state = state;
 		this.opponents = opponents;
+                this.me = me;
 	}
 
 	public List<Position> getBestPath(Position start, Position destination) {
@@ -52,7 +54,7 @@ public class AStar {
 		objectPool.put(startNode, startNode);
 		objectPool.put(destinationNode, destinationNode);
 		destinationPosition = destinationNode;
-		checkThreatPositions = true;
+                checkThreatPositions = kamikazeMode() ? false : true;
 
 		while (!openList.isEmpty()) {
 			AStarNode current = openList.first();
@@ -173,4 +175,14 @@ public class AStar {
 			return aggregator;
 		}
 	}
+
+    private boolean kamikazeMode() {
+        if(opponents.size() == 1) {
+            for(String opp : opponents) {
+                Snake opponentSnake = state.getSnake(opp);
+                return opponentSnake.getScore() < me.getScore();
+            }
+        }
+        return false;
+    }
 }
