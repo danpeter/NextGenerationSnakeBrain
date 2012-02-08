@@ -15,7 +15,7 @@ public class AStarNode extends Position {
     private int heuristicH;
     int fixedCostG;
     int estimatedCostF;
-    int moveCost = 1;
+    int moveCost = 100;
     AStarNode parent;
 
     public AStarNode(Position position, Position destination, int fixedCostG, AStarNode parent) {
@@ -32,7 +32,7 @@ public class AStarNode extends Position {
     }
     
     private int calculateManhattanDistance(Position start, Position finish) {
-        return Math.abs(finish.getX() - start.getX()) + Math.abs(finish.getY() - start.getY());
+        return (Math.abs(finish.getX() - start.getX()) + Math.abs(finish.getY() - start.getY()))*moveCost;
     }
     
     @Override

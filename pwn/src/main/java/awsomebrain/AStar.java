@@ -54,7 +54,7 @@ public class AStar {
 		objectPool.put(startNode, startNode);
 		objectPool.put(destinationNode, destinationNode);
 		destinationPosition = destinationNode;
-                checkThreatPositions = kamikazeMode() ? false : true;
+                checkThreatPositions = true;// kamikazeMode() ? false : true;
 
 		while (!openList.isEmpty()) {
 			AStarNode current = openList.first();
@@ -149,7 +149,7 @@ public class AStar {
 				int moveCost = 1;
 				if (checkThreatPositions
 						&& opponentThreatPositions.contains(position)) {
-					moveCost = 1000;
+					moveCost = kamikazeMode() ? 1 : 100000;
 					System.err.println("Found threat position: " + position);
 				}
 				AStarNode newNode = new AStarNode(position,
