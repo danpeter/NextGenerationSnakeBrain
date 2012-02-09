@@ -54,7 +54,7 @@ public class AStar {
 		objectPool.put(startNode, startNode);
 		objectPool.put(destinationNode, destinationNode);
 		destinationPosition = destinationNode;
-                checkThreatPositions = true;// kamikazeMode() ? false : true;
+                checkThreatPositions = false;//true;// kamikazeMode() ? false : true;
 
 		while (!openList.isEmpty()) {
 			AStarNode current = openList.first();

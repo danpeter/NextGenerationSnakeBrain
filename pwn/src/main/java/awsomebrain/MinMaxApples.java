@@ -58,7 +58,7 @@ public class MinMaxApples {
         }
 
         Map<Position, List<Position>> opponentDistances = calculateFruitDistances(fruits, opponent);
-        Map<Position, List<Position>> myDistances = calculateFruitDistances(fruits, opponent);
+        Map<Position, List<Position>> myDistances = calculateFruitDistances(fruits, me);
         Position opponentBestFruit = null;
         int opponentBestFruitLength = 0;
         for (Map.Entry<Position, List<Position>> entry : opponentDistances.entrySet()) {
@@ -80,7 +80,6 @@ public class MinMaxApples {
                     //We will crash in each other, should calculate who has most points;
                     return new MinMaxPosition(25, 25, 0);
                 }
-                subsetfruits = new LinkedList<Position>(fruits);
                 subsetfruits.remove(fruit);
                 subsetfruits.remove(opponentBestFruit);
                 myNewPosition = fruit;
@@ -99,7 +98,7 @@ public class MinMaxApples {
                 applesMe++;
             }
             MinMaxPosition moveHeuristic = minMax(subsetfruits, myNewPosition, opponentNewPosition, applesMe, applesOpponent);
-            scores.add(new MinMaxPosition(moveHeuristic.getX(), moveHeuristic.getY(), moveHeuristic.score));
+            scores.add(new MinMaxPosition(fruit.getX(), fruit.getY(), moveHeuristic.score));
         }
         return scores.last();
     }

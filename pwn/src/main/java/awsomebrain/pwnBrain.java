@@ -28,7 +28,7 @@ public class pwnBrain extends BaseBrain {
 			long start = System.nanoTime();
 			Movement mov = calculateNextMove(state);
 			long total = System.nanoTime() - start;
-			// System.out.println("Total time: " + total / 1000000);
+		        System.out.println("Total time: " + total / 1000000);
 			return mov;
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -52,26 +52,6 @@ public class pwnBrain extends BaseBrain {
 			return FORWARD;
 		}
                 MinMaxApples miniMaxi = new MinMaxApples(fruits, me, opponent, state);
-		//AStar algo = new AStar(state, participants, me);
-		/*List<Position> bestPath = new LinkedList<Position>();
-		
-		if (fruits.isEmpty()) {
-			bestPath = algo.getBestPath(headPosition, new Position(25, 25));
-		} else {
-			for (Position fruit : fruits) {
-				List<Position> path = algo.getBestPath(headPosition, fruit);
-				if (bestPath.isEmpty()
-						|| (!path.isEmpty() && path.size() < bestPath.size())) {
-					bestPath = path;
-				}
-			}
-		}
-
-		if (bestPath.isEmpty()) {
-			System.err.println("No path to apple");
-			return FORWARD;
-		}
-		Position nextPosition = bestPath.get(0);*/
                 List<Position> path = miniMaxi.getOptimalApple();
                 Position nextPosition = path.get(0);
 		// System.out.println("current position: " + headPosition);
