@@ -1,5 +1,6 @@
 package awsomebrain;
 
+import com.sun.corba.se.spi.protocol.ForwardException;
 import java.util.LinkedList;
 import java.util.List;
 import se.citerus.crazysnake.*;
@@ -43,8 +44,16 @@ public class pwnBrain extends BaseBrain {
 		Direction direction = me.getDirection();
 
 		participants.remove(getName());
-		AStar algo = new AStar(state, participants, me);
-		List<Position> bestPath = new LinkedList<Position>();
+                Snake opponent = null;
+                for(String snake : participants) {
+                    opponent = state.getSnake(snake);
+                }
+                if (fruits.isEmpty()) {
+			return FORWARD;
+		}
+                MinMaxApples miniMaxi = new MinMaxApples(fruits, me, opponent, state);
+		//AStar algo = new AStar(state, participants, me);
+		/*List<Position> bestPath = new LinkedList<Position>();
 		
 		if (fruits.isEmpty()) {
 			bestPath = algo.getBestPath(headPosition, new Position(25, 25));
@@ -62,7 +71,9 @@ public class pwnBrain extends BaseBrain {
 			System.err.println("No path to apple");
 			return FORWARD;
 		}
-		Position nextPosition = bestPath.get(0);
+		Position nextPosition = bestPath.get(0);*/
+                List<Position> path = miniMaxi.getOptimalApple();
+                Position nextPosition = path.get(0);
 		// System.out.println("current position: " + headPosition);
 		// System.out.println("next position: " + nextPosition);
 		Direction newDirection = calculateDirection(headPosition, nextPosition);
