@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import se.citerus.crazysnake.GameState;
+import se.citerus.crazysnake.HeatState;
 import se.citerus.crazysnake.Position;
 import se.citerus.crazysnake.Snake;
 
@@ -24,18 +24,18 @@ import se.citerus.crazysnake.Snake;
  */
 public class AStar {
 
-	GameState state;
+	HeatState state;
 	Map<Position, AStarNode> objectPool;
 	Position destinationPosition;
-	private Set<String> opponents;
 	private Set<Position> opponentThreatPositions;
 	private boolean checkThreatPositions;
-        private final Snake me;
+	private final Snake me;
+	private final Snake opponent;
 
-	public AStar(GameState state, Set<String> opponents, Snake me) {
+	public AStar(HeatState state, Snake opponent, Snake me) {
 		this.state = state;
-		this.opponents = opponents;
-                this.me = me;
+		this.opponent = opponent;
+		this.me = me;
 	}
 
 	public List<Position> getBestPath(Position start, Position destination) {
@@ -54,7 +54,7 @@ public class AStar {
 		objectPool.put(startNode, startNode);
 		objectPool.put(destinationNode, destinationNode);
 		destinationPosition = destinationNode;
-                checkThreatPositions = true;// kamikazeMode() ? false : true;
+		checkThreatPositions = true;// kamikazeMode() ? false : true;
 
 		while (!openList.isEmpty()) {
 			AStarNode current = openList.first();
@@ -69,19 +69,24 @@ public class AStar {
 				checkThreatPositions = false;
 				for (AStarNode neighbour : neighbours) {
 					if (closedSet.contains(neighbour)
-							&& neighbour.fixedCostG > current.fixedCostG + neighbour.moveCost) {
-						neighbour.setFixedCost(current.fixedCostG + neighbour.moveCost);
+							&& neighbour.fixedCostG > current.fixedCostG
+									+ neighbour.moveCost) {
+						neighbour.setFixedCost(current.fixedCostG
+								+ neighbour.moveCost);
 						neighbour.parent = current;
 					} else if (openList.contains(neighbour)
-							&& neighbour.fixedCostG > current.fixedCostG + neighbour.moveCost) {
-						neighbour.setFixedCost(current.fixedCostG + neighbour.moveCost);
+							&& neighbour.fixedCostG > current.fixedCostG
+									+ neighbour.moveCost) {
+						neighbour.setFixedCost(current.fixedCostG
+								+ neighbour.moveCost);
 						neighbour.parent = current;
 						openList.remove(neighbour); // remove and re-add to
 						// update sorting on F
 						openList.add(neighbour);
 					} else if (!closedSet.contains(neighbour)
 							&& !openList.contains(neighbour)) {
-						neighbour.setFixedCost(current.fixedCostG + neighbour.moveCost);
+						neighbour.setFixedCost(current.fixedCostG
+								+ neighbour.moveCost);
 						openList.add(neighbour);
 					}
 				}
@@ -92,17 +97,8 @@ public class AStar {
 	}
 
 	private void calculateOpponentThreatPositions() {
-		Set<Position> opponentsSet = new HashSet<Position>();
-		for (String opp : opponents) {
-			Snake snake = state.getSnake(opp);
-			if (snake != null) {
-				opponentsSet.add(snake.getHeadPosition());
-			}
-		}
 		Set<Position> neighbours = new HashSet<Position>();
-		for (Position pos : opponentsSet) {
-			neighbours.addAll(getNeighbours(pos));
-		}
+		neighbours.addAll(getNeighbours(opponent.getHeadPosition()));
 
 		this.opponentThreatPositions = neighbours;
 	}
@@ -156,7 +152,7 @@ public class AStar {
 						destinationPosition, current.fixedCostG + moveCost,
 						current);
 				newNode.moveCost = moveCost;
-				
+
 				neighbours.add(newNode);
 				objectPool.put(newNode, newNode);
 			} else {
@@ -176,13 +172,7 @@ public class AStar {
 		}
 	}
 
-    private boolean kamikazeMode() {
-        if(opponents.size() == 1) {
-            for(String opp : opponents) {
-                Snake opponentSnake = state.getSnake(opp);
-                return opponentSnake.getScore() < me.getScore();
-            }
-        }
-        return false;
-    }
+	private boolean kamikazeMode() {
+		return opponent.getScore() < me.getScore();
+	}
 }

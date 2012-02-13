@@ -22,7 +22,7 @@ public class pwnBrain extends BaseBrain {
 	}
 
 	@Override
-	public Movement getNextMove(GameState state) {
+	public Movement getNextMove(HeatState state) {
 		try {
 			long start = System.nanoTime();
 			Movement mov = calculateNextMove(state);
@@ -35,15 +35,15 @@ public class pwnBrain extends BaseBrain {
 		}
 	}
 
-	private Movement calculateNextMove(GameState state) {
+	private Movement calculateNextMove(HeatState state) {
 
-		Snake me = state.getSnake(getName());
+		Snake me = getMe(state);
+		Snake opponent = getOpponent(state);
 		Position headPosition = me.getHeadPosition();
 		List<Position> fruits = state.getFruitPositions();
 		Direction direction = me.getDirection();
 
-		participants.remove(getName());
-		AStar algo = new AStar(state, participants, me);
+		AStar algo = new AStar(state, opponent, me);
 		List<Position> bestPath = new LinkedList<Position>();
 		
 		if (fruits.isEmpty()) {
